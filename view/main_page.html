@@ -1,0 +1,29 @@
+<!--
+Application login page. It contains a simple form for email and password,
+an error message, and a button to submit the credentials.
+There is also a link to the registration page. The layout is controlled by
+an external stylesheet, while the authentication logic is handled by
+the JavaScript script included at the bottom of the page.
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>HDLV login</title>
+        <link rel="stylesheet" href="main_page.css">
+        
+    </head>
+
+    <body>
+        <div id="container">
+            <div>Credentials:</div>
+            <input type="text" placeholder="Email" id="email"> 
+            <input type="password" placeholder="Password" id="password"> <br>
+            <div id="message"></div>
+            <button id="btnCred">Login</button>
+            <a href="registration.html">Not registered yet? Click here</a>   
+        </div> 
+        <script src="script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<!--
+Page dedicated to user registration. It contains a form with the fields
+required to create a new account: login credentials (email and password with
+guidelines on requirements) and personal information such as first name, last name, tax ID,
+gender, and date of birth. The layout is managed via an external CSS sheet,
+while the validation logic and data submission to the backend are handled by the
+JavaScript script included at the bottom of the page.
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HDLV Registration</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="registration.css">
+    </head>
+    <body>
+        <div id="container1">
+            <div>Insert credentials:</div>
+            <input type="email" placeholder="Email" id="email"> <br>
+            <div id="emailWarning"></div>
+            <input type="password" placeholder="Password" id="password1">
+            <ol>
+                <li>Password must be al least 8 character long;</li>
+                <li>It must include at least one uppercase letter;</li>
+                <li>One special character ('-', '@', '!').</li>
+            </ol> 
+            <input type="password" placeholder="Repeat password" id="password2"><br>
+            <div id="passwordWarning"></div>
+            <div>Insert your datas:</div>
+            <input type="text" placeholder="Name" id="name"> <br>
+            <input type="text" placeholder="Surname" id="surname"> <br>
+            <input type="text" placeholder="Fiscal code" id="fiscalcode"> <br>
+            <label for="gender">Gender:</label> 
+            
+            <select id="gender">
+                <option value="M">M</option>
+                <option value="F">F</option>
+                <option value="others">Others</option>
+            </select> <br>
+            <div>Your birthday:</div>
+            <input type="date" id="birthday"> <br>
+            <button id="btnRgs">Register</button> <br>
+            <div id="emptyFieldsOrRegistered"></div>
+
+            <script src="registration.js"></script>
+            
+        </div>
+    </body>
+</html>

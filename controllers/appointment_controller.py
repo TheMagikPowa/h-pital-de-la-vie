@@ -1,0 +1,100 @@
+from flask import Blueprint, jsonify, request
+from models.appointments_model import delete_ftr_app, set_appointments, appointment_already_exist, future_app, old_app, set_doctor_to_appointment
+from utils.utility_functions import generate_next_time, date_converter, sort_doctor
+from models.doctors_model import doctors
+from models.patients_model import get_patient_by_id
+from utils.classes import Doctor, Patient
+
+# Here i'm giong to create the blueprint to allow a link for app.py
+appointments= Blueprint('appointments', __name__)
+
+# This route is used to book an appointment from the dashboard, and what I do is send a POST request to create it.
+@appointments.route('/appointments', methods=['POST'])                               
+def set_app ():
+
+    # Here I retrieve the information from the frontend.
+    data=request.get_json()
+    dataApp= data.get('appointment')
+    patient_id= int(data.get('patient_id'))
+
+    # I generate the next available schedule for the hospital by simulating the waiting time between appointments from 9 a.m. to 5 p.m., in 30-minute intervals.
+    time = generate_next_time(dataApp)
+
+    # I generate an object patient with info taken from the db.
+    patient_data = get_patient_by_id(patient_id)
+    patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'], 
+                     patient_data['nome'], patient_data['cognome'],
+                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+
+    # I'm limiting it to one appointment per day to avoid spam.
+    app_already_exist= appointment_already_exist(dataApp, patient_id)
+    if app_already_exist:
+        return jsonify({'text': 'Appointment already exist.'}), 400
+
+    # If it's 5 p.m., no more appointments for that day. 
+    if time is None:
+        return jsonify({'text': 'No more slots available for this day.'}), 400
+
+    # If the above information has been provided, I will create the appointment.
+    patient.take_appointment(dataApp, time, set_appointments)
+    
+    return jsonify({'text': 'Appointment added.'}), 200
+
+# In this route i take the patient's future appointments and show them.
+# The information we need are taken and passed via URL.
+@appointments.route('/future_appointments/<int:patient_id>/<string:today>', methods=['GET'])
+def future_appointments(patient_id, today):
+    
+    # Creating the object patient for looking for future appointments.
+    patient_data = get_patient_by_id(patient_id)
+    patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'],
+                     patient_data['nome'], patient_data['cognome'],
+                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+    
+    ftr_app= patient.look_for_future_appointment(today, future_app)
+    
+    # If there are not...
+    if not ftr_app:
+        return jsonify({'text': "You don't have future appointments."})
+    
+    # I need to convert the date, otherwise frontent shows info that i don't want to show.
+    ftr_app= date_converter(ftr_app)
+
+    return jsonify({'appointments': ftr_app})
+
+# The logic is the same of the previous route, but here i'm going tu simulate the visit with a doctor.
+# I have randomized
+@appointments.route('/old_appointments/<int:patient_id>/<string:today>', methods=['GET'])
+def old_appointment (patient_id, today):
+    
+    # I randomly assigned the doctor who will examine the patient.
+    all_doctors= doctors()
+    doctor= sort_doctor(all_doctors)
+    doctor= Doctor(doctor['id'], doctor['name'], doctor['surname'], doctor['specialization'])
+    
+    # A doctor is chosen to conduct the visit.
+    set_doctor_to_appointment(doctor.id, patient_id, today, doctor)
+    
+    patient_data = get_patient_by_id(patient_id)
+    patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'], 
+                     patient_data['nome'], patient_data['cognome'],
+                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+
+    old_ap=patient.look_for_old_appointments(today, old_app)
+    
+    # If there are not old appointments...
+    if not old_ap:
+        return jsonify({'text': "You don't have old appointments."})
+    
+    old_ap= date_converter(old_ap)
+
+    return jsonify({'appointments': old_ap})
+
+@appointments.route('/dlt_appointment/<int:id>', methods=['DELETE'])
+def delete_appointment(id):
+    deleted = delete_ftr_app(id)
+
+    if deleted:
+        return jsonify({"text": "Appointment deleted."})
+    else:
+        return jsonify({"text": "Unable to delete appointment."})

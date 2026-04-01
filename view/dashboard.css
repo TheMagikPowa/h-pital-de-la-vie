@@ -1,0 +1,60 @@
+/* Dashboard style: sets the page background, organizes the layout into two sections
+   (sidebar + content area), and applies a blur effect. The sidebar is dark and semi-transparent,
+   with interactive items that change color on mouseover. The central area displays the
+   content, with text that remains legible thanks to the applied shadow. */
+
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url("img_main_page.png");
+    background-size: cover;
+    background-position: center;
+}
+
+/* Main layout */
+.dashboard {
+    display: flex;
+    height: 100vh;
+    backdrop-filter: blur(4px); /* effetto elegante */
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 12px 10px;
+    margin: 8px 0;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sidebar li:hover {
+    background-color: rgba(255,255,255,0.25);
+}
+
+/* Contents area */
+.content {
+    flex: 1;
+    padding: 40px;
+    color: white;
+    text-shadow: 0 0 4px black;
+}

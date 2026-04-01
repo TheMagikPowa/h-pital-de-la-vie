@@ -1,0 +1,20 @@
+/* Registration page style: applies a full-screen background image
+   and uses flexbox to center the form container both vertically and horizontally.
+   The gap controls the spacing between elements, while the top margin adjusts the
+   position of the block relative to the page. */
+   
+body {
+    background-image: url("img_main_page.png");
+    background-size: cover;
+}  /*tecnobits, fonte*/
+
+
+#container1 {
+    height: 100vh; /* altezza = schermo */ 
+    display: flex; /* attiva flexbox */ 
+    flex-direction: column; /* elementi in colonna */ 
+    justify-content: center; /* centro verticale */ 
+    align-items: center; /* centro orizzontale */ 
+    gap: 3px; /* spazio tra gli elementi */ 
+    margin-top: 290px;
+}

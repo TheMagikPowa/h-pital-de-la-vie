@@ -1,0 +1,20 @@
+/* Login page style: sets a full-screen background image
+   and centers the form container vertically and horizontally using flexbox.
+   The gap controls the spacing between form elements. */
+
+
+body {
+    background-image: url("img_main_page.png");
+    background-size: cover;
+} 
+
+#container { 
+    height: 100vh; /* altezza = schermo */ 
+    display: flex; /* attiva flexbox */ 
+    flex-direction: column; /* elementi in colonna */ 
+    justify-content: center; /* centro verticale */ 
+    align-items: center; /* centro orizzontale */ 
+    gap: 10px; /* spazio tra gli elementi */ 
+    margin-top: 100px;
+}
+
