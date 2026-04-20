@@ -27,8 +27,8 @@ def medical_records(patient_id, today):
         
     patient_data = get_patient_by_id(patient_id)
     patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'],
-                     patient_data['nome'], patient_data['cognome'],
-                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+                     patient_data['name'], patient_data['surname'],
+                     patient_data['gender'], patient_data['birthday'], patient_data['fiscal_code'])
 
     # I write the medical record into the database.
     records= patient.look_for_medicalrecords(get_medical_records)

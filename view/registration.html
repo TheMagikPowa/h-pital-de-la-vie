@@ -40,6 +40,19 @@ JavaScript script included at the bottom of the page.
             </select> <br>
             <div>Your birthday:</div>
             <input type="date" id="birthday"> <br>
+            <script>
+                const input = document.getElementById("birthday");
+
+                const today = new Date();
+                const minAgeDate = new Date(
+                    today.getFullYear() - 14,
+                    today.getMonth(),
+                    today.getDate()
+                );
+
+                input.max = minAgeDate.toISOString().split("T")[0];
+            </script>
+            <div>You must be at least 14 years old.</div> <br>
             <button id="btnRgs">Register</button> <br>
             <div id="emptyFieldsOrRegistered"></div>
 

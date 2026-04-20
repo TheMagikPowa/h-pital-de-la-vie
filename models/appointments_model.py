@@ -1,11 +1,11 @@
 from utils.db import get_cursor
 
 # I save the appointment
-def set_appointments (dataApp, patient_id, time):            
+def set_appointments (date_app, patient_id, time):            
     conn, cursor=get_cursor()
-    query=("INSERT INTO appointment (dataApp, patient_id, time)"
+    query=("INSERT INTO appointment (date_app, patient_id, time)"
     "VALUES (%s, %s, %s)")
-    cursor.execute(query, (dataApp, patient_id, time))
+    cursor.execute(query, (date_app, patient_id, time))
 
     # Saves changes and close the connection with db.
     conn.commit()
@@ -24,7 +24,7 @@ def upd_appointment():
 # It takes only one visit.
 def get_last_appointment_time():
     conn, cursor= get_cursor()
-    query="""SELECT time, FROM appointment, ORDER BY dataApp DESC, time DESC, LIMIT 1;"""
+    query="""SELECT time, FROM appointment, ORDER BY date_app DESC, time DESC, LIMIT 1;"""
 
     cursor.execute(query)
     result=cursor.fetchone()
@@ -39,7 +39,7 @@ def get_last_time_of_day(date):
     query = """
         SELECT time
         FROM appointment
-        WHERE dataApp = %s
+        WHERE date_app = %s
         ORDER BY time DESC
         LIMIT 1
     """
@@ -50,15 +50,15 @@ def get_last_time_of_day(date):
 
     return row['time'] if row else None
 
-def appointment_already_exist (dataApp, patient_id):
+def appointment_already_exist (date_app, patient_id):
     conn, cursor= get_cursor()
     query="""
         SELECT *
         FROM appointment
-        WHERE dataApp= %s AND patient_id= %s
+        WHERE date_app= %s AND patient_id= %s
         LIMIT 1
         """
-    cursor.execute(query, (dataApp, patient_id))
+    cursor.execute(query, (date_app, patient_id))
     result= cursor.fetchone()
     if result:
         cursor.close()
@@ -73,10 +73,10 @@ def appointment_already_exist (dataApp, patient_id):
 def future_app(patient_id, date):
     conn, cursor= get_cursor()
     query="""
-        SELECT id, dataApp, time
+        SELECT id, date_app, time
         FROM appointment
-        WHERE patient_id= %s AND dataApp> %s
-        ORDER BY dataApp ASC, time ASC"""
+        WHERE patient_id= %s AND date_app> %s
+        ORDER BY date_app ASC, time ASC"""
     
     cursor.execute(query, (patient_id, date))
     result= cursor.fetchall()
@@ -88,10 +88,10 @@ def future_app(patient_id, date):
 def old_app(patient_id, date):
     conn, cursor= get_cursor()
     query="""
-        SELECT dataApp, time, doctor, specialization
+        SELECT date_app, time, doctor, specialization
         FROM appointment
-        WHERE patient_id= %s AND dataApp<= %s
-        ORDER BY dataApp ASC, time ASC"""
+        WHERE patient_id= %s AND date_app<= %s
+        ORDER BY date_app ASC, time ASC"""
     
     cursor.execute(query, (patient_id, date))
     result= cursor.fetchall()
@@ -109,8 +109,8 @@ def set_doctor_to_appointment(doctor_id, patient_id, today, doctor):
         SELECT id, doctor
         FROM appointment
         WHERE patient_id = %s
-          AND dataApp <= %s
-        ORDER BY dataApp DESC
+          AND date_app <= %s
+        ORDER BY date_app DESC
         
     """
     cursor.execute(find_query, (patient_id, today))

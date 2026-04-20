@@ -38,9 +38,9 @@ def generate_next_time(date):
 def date_converter(appointments):
     for app in appointments:
 
-        # Converti dataApp → stringa
-        if isinstance(app["dataApp"], date_type):
-            app["dataApp"] = app["dataApp"].strftime("%d-%m-%Y")
+        # Converti date_app → stringa
+        if isinstance(app["date_app"], date_type):
+            app["date_app"] = app["date_app"].strftime("%d-%m-%Y")
 
         # Converti time → stringa HH:MM
         t = app["time"]
@@ -51,8 +51,6 @@ def date_converter(appointments):
             app["time"] = f"{hours:02d}:{minutes:02d}"
         elif isinstance(t, time):
             app["time"] = t.strftime("%H:%M")
-            
-        print(appointments)
     
     return appointments
 

@@ -14,20 +14,20 @@ def set_app ():
 
     # Here I retrieve the information from the frontend.
     data=request.get_json()
-    dataApp= data.get('appointment')
+    date_app= data.get('appointment')
     patient_id= int(data.get('patient_id'))
 
     # I generate the next available schedule for the hospital by simulating the waiting time between appointments from 9 a.m. to 5 p.m., in 30-minute intervals.
-    time = generate_next_time(dataApp)
+    time = generate_next_time(date_app)
 
     # I generate an object patient with info taken from the db.
     patient_data = get_patient_by_id(patient_id)
     patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'], 
-                     patient_data['nome'], patient_data['cognome'],
-                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+                     patient_data['name'], patient_data['surname'],
+                     patient_data['gender'], patient_data['birthday'], patient_data['fiscal_code'])
 
     # I'm limiting it to one appointment per day to avoid spam.
-    app_already_exist= appointment_already_exist(dataApp, patient_id)
+    app_already_exist= appointment_already_exist(date_app, patient_id)
     if app_already_exist:
         return jsonify({'text': 'Appointment already exist.'}), 400
 
@@ -36,7 +36,7 @@ def set_app ():
         return jsonify({'text': 'No more slots available for this day.'}), 400
 
     # If the above information has been provided, I will create the appointment.
-    patient.take_appointment(dataApp, time, set_appointments)
+    patient.take_appointment(date_app, time, set_appointments)
     
     return jsonify({'text': 'Appointment added.'}), 200
 
@@ -48,8 +48,8 @@ def future_appointments(patient_id, today):
     # Creating the object patient for looking for future appointments.
     patient_data = get_patient_by_id(patient_id)
     patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'],
-                     patient_data['nome'], patient_data['cognome'],
-                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+                     patient_data['name'], patient_data['surname'],
+                     patient_data['gender'], patient_data['birthday'], patient_data['fiscal_code'])
     
     ftr_app= patient.look_for_future_appointment(today, future_app)
     
@@ -77,8 +77,8 @@ def old_appointment (patient_id, today):
     
     patient_data = get_patient_by_id(patient_id)
     patient= Patient(patient_data['email'], patient_data['password'], patient_data['user_id'], 
-                     patient_data['nome'], patient_data['cognome'],
-                     patient_data['genere'], patient_data['data_nascita'], patient_data['codice_fiscale'])
+                     patient_data['name'], patient_data['surname'],
+                     patient_data['gender'], patient_data['birthday'], patient_data['fiscal_code'])
 
     old_ap=patient.look_for_old_appointments(today, old_app)
     

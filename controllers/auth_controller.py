@@ -3,7 +3,7 @@ from models.users_model import get_info_profile, get_user_by_credentials, check_
 from utils.hashing import hashing
 from utils.classes import User, Patient
 from utils.credential_validation import format_validation, email_validation, password_validation
-import jwt
+
 from config import JWT_KEY, JWT_ALG
 
 
@@ -25,14 +25,11 @@ def login():
     
     user_dict= user.do_login(get_user_by_credentials)
     
-    # If user already exist, i create a jwt token.
+    # If user already exist, i send the id to the frontend.
     if user_dict:
-        token= jwt.encode(user_dict, JWT_KEY, algorithm= JWT_ALG)
-        # In some versions of PyJWT, the token is in bytes, so it converts it to a string.
-        token = token.decode('utf-8') if isinstance(token, bytes) else token
         patient_id= user_dict.get('id')
       
-        return jsonify ({'patient_id': patient_id,'user': user_dict, 'token': token}), 200 
+        return jsonify ({'patient_id': patient_id,'user': user_dict}), 200 
     
     # If user doesn' exist.
     return jsonify({'text': 'Invalid credentials.'}), 401                           
@@ -87,11 +84,11 @@ def registration():
 @auth_bp.route('/info_profile/<int:id>', methods=['GET'])
 def info_profile(id):
     patient_info= get_info_profile(id) 
-    patient= Patient(patient_info['email'], None, None, patient_info['nome'], patient_info['cognome'],
-                     patient_info['genere'], patient_info['data_nascita'], patient_info['codice_fiscale'])
-    d = patient.data_nascita
-    d = d.strftime("%d-%m-%Y") #altrimenti la data viene formattata dal front automaticamente
-    patient.data_nascita = d
+    patient= Patient(patient_info['email'], None, None, patient_info['name'], patient_info['surname'],
+                     patient_info['gender'], patient_info['birthday'], patient_info['fiscal_code'])
+    d = patient.birthday
+    d = d.strftime("%d-%m-%Y") #Otherwise, the date will be modified from the fe.
+    patient.birthday = d
     
 
     return jsonify(patient.to_dict())

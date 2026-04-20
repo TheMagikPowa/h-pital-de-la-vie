@@ -1,101 +1,106 @@
-#Tables
+-- Table: Appointment
+CREATE TABLE `appointment` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `patient_id` INT NOT NULL,
+    `doctor_id` INT DEFAULT NULL,
+    `date_app` DATE NOT NULL,
+    `time` TIME NOT NULL,
+    `specialization` CHAR(30) DEFAULT NULL,
+    `doctor` CHAR(30) DEFAULT NULL,
+    `diagnosis_done` TINYINT(1) NOT NULL DEFAULT '0',
 
-CREATE DATABASE hopital_de_la_vie;
+    PRIMARY KEY (`id`),
 
-USE hopital_de_la_vie;
+    KEY `fk_appointment_patient` (`patient_id`),
+    KEY `fk_appointment_doctor` (`doctor_id`),
 
-CREATE TABLE User (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    ruolo ENUM('patient', 'doctor', 'secretariat') NOT NULL
-);
+    CONSTRAINT `fk_appointment_doctor`
+        FOREIGN KEY (`doctor_id`)
+        REFERENCES `doctor` (`id`),
 
+    CONSTRAINT `fk_appointment_patient`
+        FOREIGN KEY (`patient_id`)
+        REFERENCES `patient` (`user_id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
 
-CREATE TABLE Doctor (
-    user_id INT PRIMARY KEY,
-    licenseNumber INT NOT NULL UNIQUE,
-    specializzazione VARCHAR(100) NOT NULL,
-    nome VARCHAR(50) NOT NULL,
-    cognome VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id)
-);
+    CONSTRAINT `chk_diagnosis_done`
+        CHECK (`diagnosis_done` IN (0,1))
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
 
+-- Table: Doctor
+CREATE TABLE `doctor` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(50) NOT NULL,
+    `surname` VARCHAR(50) NOT NULL,
+    `specialization` VARCHAR(50) NOT NULL,
 
-CREATE TABLE Patient (
-    user_id INT PRIMARY KEY,
-    codice_fiscale VARCHAR(16) NOT NULL UNIQUE,
-    data_nascita DATE NOT NULL,
-    genere ENUM('M', 'F', 'Altro') NOT NULL,
-    nome VARCHAR(50) NOT NULL,
-    cognome VARCHAR(50) NOT NULL,
-    doctor_id INT NOT NULL,
-    FOREIGN KEY (doctor_id) REFERENCES Doctor(user_id),
-    FOREIGN KEY (user_id) REFERENCES User(id)
-);
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE Appointment (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    dataApp DATE NOT NULL,
-    patient_id INT NOT NULL,
-    secretariat_id INT NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES Patient(user_id),
-    FOREIGN KEY (secretariat_id) REFERENCES User(id)
-);
+-- Table: Medicalrecord
+CREATE TABLE `medicalrecord` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `patient_id` INT NOT NULL,
+    `doctor_id` INT NOT NULL,
+    `diagnosis` TEXT,
+    `status` VARCHAR(30) NOT NULL DEFAULT 'Under observation',
 
-CREATE TABLE MedicalRecord (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    diagnosis TEXT NOT NULL,
-    patient_id INT NOT NULL,
-    doctor_id INT NOT NULL,
-    secretariat_id INT NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES Patient(user_id),
-    FOREIGN KEY (doctor_id) REFERENCES Doctor(user_id),
-    FOREIGN KEY (secretariat_id) REFERENCES User(id)
-);
+    PRIMARY KEY (`id`),
 
-ALTER TABLE appointment
-ADD COLUMN doctor_id INT NOT NULL,
-ADD COLUMN time TIME NOT NULL,
-ADD COLUMN reason VARCHAR(255),
-ADD COLUMN status VARCHAR(50) DEFAULT 'scheduled';
+    KEY `patient_id` (`patient_id`),
+    KEY `doctor_id` (`doctor_id`),
 
-ALTER TABLE appointment
-ADD CONSTRAINT fk_appointment_doctor
-FOREIGN KEY (doctor_id) REFERENCES doctor(user_id);
+    CONSTRAINT `medicalrecord_ibfk_1`
+        FOREIGN KEY (`patient_id`)
+        REFERENCES `patient` (`user_id`),
 
+    CONSTRAINT `medicalrecord_ibfk_2`
+        FOREIGN KEY (`doctor_id`)
+        REFERENCES `doctor` (`id`)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
 
-SHOW CREATE TABLE appointment;
+-- Table: Patient
+CREATE TABLE `patient` (
+    `user_id` INT NOT NULL,
+    `medicalrecord_id` INT DEFAULT NULL,
+    `fiscal_code` VARCHAR(16) NOT NULL,
+    `birthday` DATE NOT NULL,
+    `gender` ENUM('M','F','Others') NOT NULL,
+    `name` VARCHAR(30) NOT NULL,
+    `surname` VARCHAR(30) NOT NULL,
 
-ALTER TABLE appointment
-DROP FOREIGN KEY fk_appointment_doctor;
+    PRIMARY KEY (`user_id`),
+    UNIQUE KEY `codice_fiscale` (`fiscal_code`),
+    KEY `medicalrecord_id` (`medicalrecord_id`),
 
-SHOW CREATE TABLE doctor;
+    CONSTRAINT `patient_ibfk_2`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`id`),
 
-ALTER TABLE appointment
-ADD CONSTRAINT fk_appointment_patient
-FOREIGN KEY (patient_id) REFERENCES patient(user_id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+    CONSTRAINT `patient_ibfk_3`
+        FOREIGN KEY (`medicalrecord_id`)
+        REFERENCES `medicalrecord` (`id`)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
 
+-- Table: User
+CREATE TABLE `user` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(100) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
 
-ALTER TABLE doctor DROP PRIMARY KEY;
-ALTER TABLE doctor DROP COLUMN user_id;
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE doctor 
-ADD COLUMN id INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
-
-SHOW CREATE TABLE medicalrecord;
-
-medicalrecord_ibfk_2
-
-ALTER TABLE doctor DROP FOREIGN KEY doctor_ibfk_1;
-
-ALTER TABLE medicalrecord
-ADD id INT NOT NULL UNIQUE
-
-ALTER TABLE patient
-ADD Foreign Key (medicalrecord_id) REFERENCES medicalrecord (id) 
-
-ALTER TABLE doctor
-MODIFY COLUMN name VARCHAR(50) NOT NULL;
+SHOW CREATE TABLE user;

@@ -1,7 +1,4 @@
-
 import random
-
-
 
 
 # We need this class only for login.
@@ -15,31 +12,31 @@ class User:
         
 # This is the most important class of the project. Patient is the core.
 class Patient (User):
-    def __init__(self, email, password, id, nome, cognome, genere, data_nascita, codice_fiscale):
+    def __init__(self, email, password, id, name, surname, gender, birthday, fiscal_code):
         super().__init__(email, password)
         self.id= id
-        self.nome= nome
-        self.cognome=cognome
-        self.genere=genere
-        self.data_nascita=data_nascita
-        self.codice_fiscale=codice_fiscale
+        self.name= name
+        self.surname=surname
+        self.gender=gender
+        self.birthday=birthday
+        self.fiscal_code=fiscal_code
 
     def to_dict(self):
         return {
             "id": self.id,
             "email": self.email,
-            "nome": self.nome,
-            "cognome": self.cognome,
-            "genere": self.genere,
-            "data_nascita": self.data_nascita,
-            "codice_fiscale": self.codice_fiscale
+            "name": self.name,
+            "surname": self.surname,
+            "gender": self.gender,
+            "birthday": self.birthday,
+            "fiscal_code": self.fiscal_code
         }
 
     def do_registration(self, register_function):
-        return register_function(self.email, self.password, self.nome, self.cognome, self.codice_fiscale, self.data_nascita, self.genere )
+        return register_function(self.email, self.password, self.name, self.surname, self.fiscal_code, self.birthday, self.gender )
 
-    def take_appointment(self, dataApp, time, function):
-        app= Appointment(dataApp, self.id, time)
+    def take_appointment(self, date_app, time, function):
+        app= Appointment(date_app, self.id, time)
         app.create_appointment(function)
 
     def look_for_future_appointment(self, today, funct_future_app):
@@ -100,13 +97,13 @@ class Doctor:
 
 # Although this class does not appear in the project, it is important because it allows us to manage appointments more naturally.
 class Appointment:
-    def __init__(self, dataApp, patient_id, time):
-        self.dataApp=dataApp
+    def __init__(self, date_app, patient_id, time):
+        self.date_app=date_app
         self.patient_id=patient_id
         self.time=time
 
     def create_appointment(self, function):
-        function(self.dataApp, self.patient_id, self.time)
+        function(self.date_app, self.patient_id, self.time)
 
     def take_ftr_appointments(self, today, function):
         return function(self.patient_id, today)

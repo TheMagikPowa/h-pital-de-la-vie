@@ -103,7 +103,7 @@ async function sendAppointment() {
 
     const res = await fetch ("http://localhost:5000/appointments", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ patient_id, appointment})
 
     })
@@ -151,7 +151,7 @@ async function loadFutureAppointments() {
             ${data.appointments.map(app => 
                  `
                 <li>
-                    <strong>Date:</strong> ${app.dataApp} <br>
+                    <strong>Date:</strong> ${app.date_app} <br>
                     <strong>Time:</strong> ${app.time} <br>
                     <button class='btnDlt' onclick="deleteAppointment(${app.id})">Delete</button>
                 </li>
@@ -189,7 +189,7 @@ async function loadPastAppointments () {
         <ul>
             ${data.appointments.map(app => `
                 <li>
-                    <strong>Date:</strong> ${app.dataApp} <br>
+                    <strong>Date:</strong> ${app.date_app} <br>
                     <strong>Time:</strong> ${app.time} <br>
                     <strong>Doctor:</strong> ${app.doctor} <br>
                     <strong>Specialization:</strong> ${app.specialization} <br>
@@ -239,11 +239,11 @@ async function loadInformation() {
     const data = await res.json();
     
     document.getElementById('email').textContent= data.email;
-    document.getElementById('name').textContent= data.nome;
-    document.getElementById('surname').textContent= data.cognome;
-    document.getElementById('gender').textContent= data.genere;
-    document.getElementById('fiscalCode').textContent= data.codice_fiscale;
-    document.getElementById('birthday').textContent= data.data_nascita;
+    document.getElementById('name').textContent= data.name;
+    document.getElementById('surname').textContent= data.surname;
+    document.getElementById('gender').textContent= data.gender;
+    document.getElementById('fiscalCode').textContent= data.fiscal_code;
+    document.getElementById('birthday').textContent= data.birthday;
 }
 
 async function deleteAppointment(id) {

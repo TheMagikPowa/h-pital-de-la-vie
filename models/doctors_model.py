@@ -4,7 +4,7 @@ from utils.db import get_cursor
 def set_doctor(doctor):
     conn, cursor= get_cursor()
     query="""
-        INSERT INTO doctor (specializzazione, nome, cognome)
+        INSERT INTO doctor (specialization, name, surname)
         VALUES (%s, %s, %s)
         """
     cursor.execute(query, (doctor.specialization, doctor.name, doctor.surname))
@@ -31,8 +31,8 @@ def get_doctor_from_last_app(patient_id, today):
         SELECT doctor_id, doctor, specialization, diagnosis_done
     FROM appointment
     WHERE patient_id = %s
-    AND dataApp <= %s
-    ORDER BY dataApp DESC
+    AND date_app <= %s
+    ORDER BY date_app DESC
     LIMIT 1;
     """
     cursor.execute(query, (patient_id, today))
