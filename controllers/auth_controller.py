@@ -2,9 +2,9 @@ from flask import Blueprint, jsonify, request
 from models.users_model import get_info_profile, get_user_by_credentials, check_email, register_user
 from utils.hashing import hashing
 from utils.classes import User, Patient
+from utils.utility_functions import validate_fiscal_code_simple
 from utils.credential_validation import format_validation, email_validation, password_validation
 
-from config import JWT_KEY, JWT_ALG
 
 
 auth_bp=Blueprint('auth', __name__)
@@ -40,7 +40,7 @@ def registration():
 
     # It reads the JSON sent from the frontend containing all the data from the registration form.                                                         
     data= request.get_json()
-
+    
     # Make sure all required fields are filled in and not left blank.
     if not format_validation(data):
         return jsonify({'text': 'Empty fields.'}), 400
@@ -59,6 +59,10 @@ def registration():
             return jsonify({'text': 'Password is not strong enough.'})
     else:
         return jsonify({'text': 'Passwords are not equal.'})
+    
+    fc= data.get('fiscal_code')
+    if not validate_fiscal_code_simple(fc):
+        return jsonify({"text": "Fiscal code is not correct."}), 400
     
     # Check the database to see if the email address is already registered.
     checked_mail=check_email(email)

@@ -14,14 +14,14 @@ def get_user_by_credentials (email, hashed_pw):
     
     return result if result else False                
 
-def register_user (email, hashed_pw, name, surname, fiscal_code, birthday, genere):
+def register_user (email, hashed_pw, name, surname, fiscal_code, birthday, gender):
     conn, cursor= get_cursor()
     query_user= "INSERT INTO user (email, password) VALUES (%s, %s)"
     cursor.execute(query_user, (email, hashed_pw))
 
     user_id= cursor.lastrowid
-    query_patient= "INSERT INTO patient (user_id, fiscal_code, birthday, genere, name, surname) VALUES (%s, %s, %s, %s, %s, %s)"
-    cursor.execute(query_patient, (user_id, fiscal_code, birthday, genere, name, surname))
+    query_patient= "INSERT INTO patient (user_id, fiscal_code, birthday, gender, name, surname) VALUES (%s, %s, %s, %s, %s, %s)"
+    cursor.execute(query_patient, (user_id, fiscal_code, birthday, gender, name, surname))
     conn.commit() 
     cursor.close()
     conn.close() 

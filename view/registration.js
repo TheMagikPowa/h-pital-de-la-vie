@@ -53,6 +53,9 @@ document.getElementById('btnRgs').addEventListener('click', async () => {
     } else if (data.text === 'Passwords are not equal.'){
         document.getElementById('passwordWarning').textContent= data.text;
         document.getElementById('passwordWarning').style.color= 'red';
+    } else if (data.text === 'Fiscal code is not correct.') {
+        document.getElementById('fiscalCodeValidator').textContent= data.text;
+        document.getElementById('fiscalCodeValidator').style.color= 'red';
     }
 
 })

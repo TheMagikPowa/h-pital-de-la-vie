@@ -3,6 +3,7 @@ from models.appointments_model import get_last_time_of_day
 from utils.classes import Doctor
 from random import randint as rd
 from models.doctors_model import set_doctor
+import re
 
 # Takes a time in string format and adds 30 minutes to it.
 def add_30_minutes(time_str):
@@ -57,7 +58,7 @@ def date_converter(appointments):
 # Generates random doctors and adds them to the database.
 def doctors_generator():
     names=['Giuseppe', 'Francesco', 'Marco', 'Valentina', 'Giovanna', 'Valeria']
-    surnames=['De Pascoli', 'Costantini', 'Farina', 'Castini', 'Rossi', 'Aureli']
+    surnames=['Pascoli', 'Costantini', 'Farina', 'Castini', 'Rossi', 'Aureli']
     specializations=["Internal Medicine","Cardiology","Gastroenterology","Endocrinology","Neurology","Psychiatry",
     "Dermatology","General Surgery","Orthopedics","Urology","Gynecology and Obstetrics","Pediatrics","Radiology"]
 
@@ -72,3 +73,16 @@ def doctors_generator():
 def sort_doctor(doctor):
     single_doc= doctor[rd(0, len(doctor)-1)]
     return single_doc
+
+# It validate the fiscal code
+def validate_fiscal_code_simple(cf):
+    if not cf:
+        return False
+
+    cf = cf.strip().upper()
+
+    if len(cf) != 16:
+        return False
+
+    pattern = r"^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$"
+    return re.match(pattern, cf) is not None
