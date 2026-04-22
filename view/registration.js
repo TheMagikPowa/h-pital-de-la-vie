@@ -59,3 +59,9 @@ document.getElementById('btnRgs').addEventListener('click', async () => {
     }
 
 })
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        document.getElementById("btnRgs").click();
+    }
+});
