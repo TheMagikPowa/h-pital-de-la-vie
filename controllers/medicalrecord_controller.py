@@ -14,6 +14,31 @@ mr_bp=Blueprint('medicalrecord', __name__)
 @mr_bp.route('/medical_records/<int:patient_id>/<string:today>', methods= ['GET'])                         
 def medical_records(patient_id, today):
 
+    """
+    Returns the patient's medical records
+    ---
+    summary: Retrieve the patient's medical records
+    description: >
+      The endpoint checks whether the patient's most recent appointment requires a diagnosis.
+      If necessary, a consultation is simulated and the medical record is created.
+      Finally, it returns all the medical records created for the patient.
+    parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: today
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+    responses:
+      200:
+        description: Returned medical records or an information message
+    """
+
     # I retrieve the patient's most recent appointment for that date from the database, along with the assigned doctor.
     doc= get_doctor_from_last_app(patient_id, today)
 
@@ -55,6 +80,6 @@ def medical_records(patient_id, today):
     # I write the medical record into the database.
     records= patient.look_for_medicalrecords(get_medical_records)
     if not records:
-        return jsonify({'text': 'No records registered yet.'})
+        return jsonify({'text': 'No records registered yet.'}), 404
     else:
-        return jsonify({'records': records})
+        return jsonify({'records': records}), 200

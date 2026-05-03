@@ -14,6 +14,35 @@ auth_bp=Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['POST'])
 def login():
 
+    """
+    Do the login
+    ---
+    summary: Checks the credentials and gives the patient id
+    description: >
+      The endpoint receives the email address and password, hashes the password
+      and verifies the credentials. If they are valid, it returns the patient ID.
+      Otherwise, it returns an error message.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            required:
+              - email
+              - password
+    responses:
+      200:
+        description: Valid credentials, logged in
+      401:
+        description: Invalid credentials
+    """
+
     #info from the frontend. I don't save the pw in the db. Before I save it in the db, I do an hashing operation.
     data= request.get_json()
     email= data.get('email')                
@@ -38,6 +67,55 @@ def login():
 @auth_bp.route('/registration', methods=['POST'])
 def registration():
 
+    """
+    Register a new user
+    ---
+    summary: Create a new patient'account
+    description: >
+      The endpoint receives the data from the registration form, validates the fields,
+      checks that the email address has not already been registered, and creates a new user.
+      It returns a confirmation message if successful.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+              password1:
+                type: string
+              name:
+                type: string
+              surname:
+                type: string
+              fiscal_code:
+                type: string
+              birthday:
+                type: string
+              gender:
+                type: string
+            required:
+              - email
+              - password
+              - password1
+              - name
+              - surname
+              - fiscal_code
+              - birthday
+              - gender
+    responses:
+      201:
+        description: Registration completed
+      400:
+        description: Missing or invalid data
+      409:
+        description: Email already registered
+    """
+
     # It reads the JSON sent from the frontend containing all the data from the registration form.                                                         
     data= request.get_json()
     
@@ -56,9 +134,9 @@ def registration():
     # I verify if password are equal.
     if password == password1:
         if not password_validation(password):
-            return jsonify({'text': 'Password is not strong enough.'})
+            return jsonify({'text': 'Password is not strong enough.'}), 400
     else:
-        return jsonify({'text': 'Passwords are not equal.'})
+        return jsonify({'text': 'Passwords are not equal.'}), 400
     
     fc= data.get('fiscal_code')
     if not validate_fiscal_code_simple(fc):
@@ -87,6 +165,25 @@ def registration():
 # This route is needed for getting patient's informations.
 @auth_bp.route('/info_profile/<int:id>', methods=['GET'])
 def info_profile(id):
+
+    """
+    Returns the patient's profile information
+    ---
+    summary: Retrieve profile data
+    description: >
+      The endpoint returns the key details of the patient's profile,
+      formatting the date of birth to prevent unintended changes by the frontend.
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Profile information returned successfully
+    """
+
     patient_info= get_info_profile(id) 
     patient= Patient(patient_info['email'], None, None, patient_info['name'], patient_info['surname'],
                      patient_info['gender'], patient_info['birthday'], patient_info['fiscal_code'])
@@ -95,4 +192,4 @@ def info_profile(id):
     patient.birthday = d
     
 
-    return jsonify(patient.to_dict())
+    return jsonify(patient.to_dict()), 200

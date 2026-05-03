@@ -12,6 +12,36 @@ appointments= Blueprint('appointments', __name__)
 @appointments.route('/appointments', methods=['POST'])                               
 def set_app ():
 
+    """
+    Create a new appointment for a patient
+    ---
+    summary: Create a new appointment
+    description: >
+      Book an appointment for a patient on a specific date.
+      The system automatically generates the first available slot between 09:00 and 17:00,
+      in 30-minute intervals. Only one appointment is permitted per day.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              appointment:
+                type: string
+                format: date
+              patient_id:
+                type: integer
+            required:
+              - appointment
+              - patient_id
+    responses:
+      200:
+        description: Appointment has been created
+      400:
+        description: Error for the appointment creation
+    """
+
     # Here I retrieve the information from the frontend.
     data=request.get_json()
     date_app= data.get('appointment')
@@ -44,6 +74,31 @@ def set_app ():
 # The information we need are taken and passed via URL.
 @appointments.route('/future_appointments/<int:patient_id>/<string:today>', methods=['GET'])
 def future_appointments(patient_id, today):
+
+    """
+    Retrieve future appointments
+    ---
+    summary: Retrieve future appointments
+    description: >
+      The endpoint returns all of a patient’s future appointments
+      from the specified date onwards. If there are no future appointments,
+      an informational message is returned.
+    parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: today
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+    responses:
+      200:
+        description: Future appointments or info message
+    """
     
     # Creating the object patient for looking for future appointments.
     patient_data = get_patient_by_id(patient_id)
@@ -55,17 +110,41 @@ def future_appointments(patient_id, today):
     
     # If there are not...
     if not ftr_app:
-        return jsonify({'text': "You don't have future appointments."})
+        return jsonify({'text': "You don't have future appointments."}), 404
     
     # I need to convert the date, otherwise frontent shows info that i don't want to show.
     ftr_app= date_converter(ftr_app)
 
-    return jsonify({'appointments': ftr_app})
+    return jsonify({'appointments': ftr_app}), 200
 
 # The logic is the same of the previous route, but here i'm going tu simulate the visit with a doctor.
 # I have randomized
 @appointments.route('/old_appointments/<int:patient_id>/<string:today>', methods=['GET'])
 def old_appointment (patient_id, today):
+
+    """
+    Recupera gli appuntamenti passati di un paziente
+    ---
+    summary: Restituisce gli appuntamenti passati
+    description: >
+      L'endpoint restituisce gli appuntamenti già svolti fino alla data indicata.
+      Se non ci sono appuntamenti passati, viene restituito un semplice messaggio informativo.
+    parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: today
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+    responses:
+      200:
+        description: Appuntamenti passati o messaggio informativo
+    """
     
     # I randomly assigned the doctor who will examine the patient.
     all_doctors= doctors()
@@ -84,17 +163,36 @@ def old_appointment (patient_id, today):
     
     # If there are not old appointments...
     if not old_ap:
-        return jsonify({'text': "You don't have old appointments."})
+        return jsonify({'text': "You don't have old appointments."}), 404
     
     old_ap= date_converter(old_ap)
 
-    return jsonify({'appointments': old_ap})
+    return jsonify({'appointments': old_ap}), 200
 
 @appointments.route('/dlt_appointment/<int:id>', methods=['DELETE'])
 def delete_appointment(id):
-    deleted = delete_ftr_app(id)
 
+    """
+    Delete a future appointment
+    ---
+    summary: Delete a future appointment
+    description: >
+      L'endpoint elimina un appuntamento identificato dal suo ID.
+      Restituisce un messaggio che indica se la cancellazione è avvenuta con successo.
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Appointment deleted or unable to delete appointment
+    """
+
+    deleted = delete_ftr_app(id)
+     
     if deleted:
-        return jsonify({"text": "Appointment deleted."})
+        return jsonify({"text": "Appointment deleted."}), 200
     else:
-        return jsonify({"text": "Unable to delete appointment."})
+        return jsonify({"text": "Unable to delete appointment."}), 404 

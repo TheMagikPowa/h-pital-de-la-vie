@@ -74,7 +74,7 @@ def sort_doctor(doctor):
     single_doc= doctor[rd(0, len(doctor)-1)]
     return single_doc
 
-# It validate the fiscal code
+# Validating the fiscal code
 def validate_fiscal_code_simple(cf):
     if not cf:
         return False
